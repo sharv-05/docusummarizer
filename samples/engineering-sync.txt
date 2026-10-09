@@ -1,0 +1,5 @@
+Alex: The team approved moving the summarization service to the new queue after the load test.
+Sam: I will prepare the rollback runbook and publish it before the next deploy.
+Rina: The dependency on the vendor webhook is a medium risk because their rate limit is undocumented.
+Alex: We should ask the vendor for a written limit and add a circuit breaker.
+Sam: The topics today were reliability, deployment safety, and the webhook dependency.

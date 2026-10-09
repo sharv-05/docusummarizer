@@ -1,0 +1,5 @@
+Nora: The launch date is May 15, pending security sign-off.
+Dev: I will send the final threat model to security by Monday.
+Nora: We agreed to keep the beta invite-only until support coverage is confirmed.
+Dev: The open risk is support capacity during the first week.
+Nora: We discussed security, launch scope, and support readiness.

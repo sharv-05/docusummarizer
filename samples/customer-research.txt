@@ -1,0 +1,5 @@
+Leah: Customers consistently asked for bulk export and clearer permissions.
+Omar: We decided to prioritize bulk export for the next discovery sprint.
+Leah: I will recruit five admin users and schedule interviews for Wednesday.
+Omar: The risk is that permission changes could surprise existing teams, so we need an audit log.
+Leah: Our next topic is validating the permission language with customers.

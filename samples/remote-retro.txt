@@ -1,0 +1,5 @@
+Chris: The team chose to keep the shorter planning meeting and move status updates async.
+Asha: I will draft the async update template and share it tomorrow.
+Chris: A risk is that blockers may be hidden if updates are too terse.
+Asha: We should add a required blocker field and review it weekly.
+Chris: The key topics were meeting design, blocker visibility, and team focus.

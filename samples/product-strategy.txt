@@ -1,0 +1,7 @@
+Maya: Thanks everyone. We need to decide whether the onboarding redesign ships in the April release.
+Jon: The usability study shows a 22% improvement in activation, but the analytics event for step three is still missing.
+Maya: Agreed, we will go with the redesign for the April release, behind a feature flag.
+Priya: I will add the missing event and send the validation dashboard by Friday.
+Jon: A risk is that the mobile implementation is two weeks behind the web build.
+Maya: Jon will schedule a mobile readiness review with the platform team next Tuesday.
+Maya: The main topics were activation, analytics quality, and the mobile timeline.
