@@ -2,17 +2,22 @@
 
 DocuSummarizer turns raw `.txt`, `.docx`, and `.pdf` meeting transcripts into a structured, reviewable intelligence packet: executive summary, speaker-attributed decisions, owner/deadline action items, topic clusters, and risk flags.
 
-## Highlights
+This repository implements the **Code-A-Nova Internship Project Brief — Task 5**. It is intentionally a meeting-intelligence product; it is not the separate HireIQ interview-intelligence platform.
 
-- Streamlit UI with upload, processing status, tabbed results, and exports
-- Handles transcripts up to 50,000 words with speaker-aware recursive chunking and overlap
-- LangChain `RecursiveCharacterTextSplitter` when installed, with a safe local fallback
-- Pydantic structured output models and retry-safe parsing
-- OpenAI-compatible live provider behind environment variables; deterministic mock mode by default
-- Token budget and cost estimates tracked per pipeline step
-- ReportLab PDF and JSON export
-- ROUGE-1/2/L evaluation helpers and manual quality rubric
-- Pytest suite using mocked/deterministic responses
+## Features mapped to the brief
+
+- Streamlit upload/review UI for `.txt`, `.docx`, and `.pdf` transcripts
+- Normalization and speaker-label detection with a 50,000-word safety limit
+- LangChain `RecursiveCharacterTextSplitter` with speaker-aware separators and overlap
+- Multi-step LangChain pipeline: chunk summarization → global structured extraction
+- Pydantic models for decisions, action items, risks, topic clusters, and report metadata
+- OpenAI GPT-4o-mini live mode through environment variables, with two-attempt retry and safe deterministic fallback
+- Mock mode by default, so the demo and tests run without an API key or paid provider
+- Per-step token estimates, model name, and configurable cost estimates in the UI and JSON export
+- Tabbed Streamlit results for summary, decisions, actions, risks/topics, and token ledger
+- Branded ReportLab PDF and complete JSON export
+- ROUGE-1/2/L evaluation helper over five sample transcripts plus a manual rubric field
+- Pytest regression suite covering ingestion, chunking validation, structured extraction, and exports
 
 ## Quick start (demo mode, no API key)
 
@@ -23,7 +28,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Open the URL printed by Streamlit, upload a transcript, or click **Load sample transcript**. Demo mode (`LLM_PROVIDER=mock`) does not call external services.
+Open the URL printed by Streamlit, upload a transcript, or click **Load sample transcript**. Demo mode (`LLM_PROVIDER=mock`) uses bounded deterministic extraction and does not call external services.
 
 ## Live LLM mode
 
@@ -33,7 +38,16 @@ cp .env.example .env
 streamlit run app.py
 ```
 
-The API key is loaded only by the Python process and is never embedded in exported JSON, the browser, or source control. The default model is `gpt-4o-mini`; Gemini can be added behind the same provider boundary.
+The API key is read only by the Python process and is never embedded in exported JSON, the browser, or source control. The default model is `gpt-4o-mini`; provider/model/cost settings are configurable through environment variables.
+
+## Validation
+
+```bash
+pytest -q
+python -m docusummarizer.evaluation
+```
+
+The evaluator runs against five supplied sample transcripts and emits ROUGE-1/2/L plus the rubric fields. Tests use mock mode and do not require network access.
 
 ## Docker
 
@@ -44,23 +58,19 @@ docker run --rm -p 8501:8501 --env-file .env docusummarizer
 
 ## Project layout
 
-- `app.py` — Streamlit UI
+- `app.py` — Streamlit UI and export controls
 - `docusummarizer/ingestion.py` — `.txt`, `.docx`, `.pdf` parsing and normalization
-- `docusummarizer/chunking.py` — speaker-aware chunking and token estimates
-- `docusummarizer/models.py` — Pydantic extraction schema
-- `docusummarizer/prompts.py` — documented prompt templates and bias/safety guardrails
-- `docusummarizer/llm.py` — mock/live provider boundary and retry-safe structured extraction
-- `docusummarizer/pipeline.py` — end-to-end orchestration and cost ledger
-- `docusummarizer/export.py` — JSON and branded ReportLab PDF
-- `docusummarizer/evaluation.py` — ROUGE metrics and manual rubric
+- `docusummarizer/chunking.py` — speaker-aware recursive chunking and token estimates
+- `docusummarizer/models.py` — Pydantic extraction schemas
+- `docusummarizer/prompts.py` — documented prompt templates and guardrails
+- `docusummarizer/llm.py` — LangChain provider boundary, retries, mock mode, and token ledger
+- `docusummarizer/pipeline.py` — end-to-end orchestration
+- `docusummarizer/export.py` — JSON and branded ReportLab PDF exports
+- `docusummarizer/evaluation.py` — ROUGE metrics and rubric output
 - `samples/` — five sample meeting transcripts
 - `docs/` — architecture, prompt decisions, and demo walkthrough
+- `tests/` — pytest regression suite
 
-## Evaluation
+## Notes on reliability
 
-```bash
-pytest -q
-python -m docusummarizer.evaluation
-```
-
-The evaluator compares generated summaries to reference summaries with ROUGE-1/2/L and records a manual rubric for attribution, completeness, and actionability. See `docs/evaluation.md`.
+The repaired `extract_structured` entry point always returns a validated `MeetingExtraction`. Live provider and structured-parser failures are retried once and then fall back to deterministic local extraction, so a transient API or malformed-response error cannot crash the Streamlit workflow.
